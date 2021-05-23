@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-inner">
+    <div class="page-title mb-15">
+        <div class="pull-left">
+            <h3 class="breadcrumb-header">Courses</h3>
+            <p class="text-muted mb-0">Courses under Institutions</p>
+        </div>
+        <div class="pull-right">
+            <div class="btn-group mx-auto">
+                <ol class="breadcrumb hide-phone pt-4 pb-4 m-0">
+                    <li class="breadcrumb-item"><a href="#">Eduvy</a></li>
+                    <li class="breadcrumb-item"><a href="#">Institutions</a></li>
+                    <li class="breadcrumb-item active">Courses</li>
+                </ol>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div id="main-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel mb-0">
+                    <div class="panel-body">
+                        <h4 class="mt-0 header-title"></h4>
+                        <div class="row data-filter" style="padding-top: 50px;">
+                            <div class="col-md-1">
+                            </div>
+                            <form method="post" action="http://65.1.111.25/eduvy/admin/institute_course/index"
+                                autocomplete="off">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <input type="search" id="searchput" name="search" placeholder="Search..."
+                                            class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <button name="searchbutt" id="searchbut"
+                                            class="btn btn-warning form-control">Search</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <button name="export" type="submit"
+                                            class="btn btn-info form-control">Export</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <button name="addnew" class="btn btn-success form-control btn-add">Add <b
+                                            class="fa fa-plus"></b></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <br>
+                            <!--Table Section-->
+                            <table class="table table-hover table-striped table-responsive data-list" style="">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Course Code</th>
+                                        <th scope="col">Course</th>
+                                        <th scope="col">Branch</th>
+                                        <th scope="col">Fees</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if insticoures %}
+                                    {% for i in insticoures %}
+                                    <tr>
+                                    {% if request.user.is_superuser %}
+                                        {% for c in course%}
+                                        {% if c.id == i.courseId %}
+                                        <td scope="row">
+                                            <img height="80px" src="media/{{c.CourseImage}}">
+                                        </td>
+                                        {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if request.user.is_institute %}
+                                        {% for c in course%}
+                                        {% if c.id == i.courseId %}
+                                        <td scope="row">
+                                            <img height="80px" src="media/{{c.CourseImage}}">
+                                        </td>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% endif %}
+                                        <td>{{i.courseCode}}</td>
+                                        {% for c in course%}
+                                        {% if c.id == i.courseId %}
+                                        <td>{{c.CourseName}}</td>
+                                        {% endif %}
+                                        {% endfor %}
+                                        {% for c in branch%}
+                                        {% if c.id == i.branchId %}
+                                        <td>{{c.BranchName}}</td>
+                                        {% endif %}
+                                        {% endfor %}
+
+
+                                        <td>₹ {{i.courseFee}}</td>
+                                        <td>{{i.Status}}</td>
+                                        <td>
+                                            <span style="cursor:pointer;font-size:1em;" class="fa fa-pencil edit-column"
+                                                id="{{i.id}}">
+                                            </span>
+                                            <span style="cursor:pointer;margin-left:15px;color:red;font-size:1em;"
+                                                class="fa fa-trash delete-column" id="{{i.id}}">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                    <tr>
+                                        <td colspan="7">
+                                            <nav aria-label="Page navigation example">
+                                                <ul class="pagination">
+                                                    <li class="page-item"></li>
+                                                </ul>
+                                            </nav>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!--On click Add Button-->
+                            <div class="row data-add" style="padding-top: 50px; display: none;">
+                                <form method="post" enctype="multipart/form-data" action="institutecourse">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label>Course Code</label>
+                                                <input type="text" class="form-control" name="course_code" required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                {% if request.user.is_superuser %}
+                                                <label>Branch</label>
+                                                <select class="form-control branch_list" name="branch">
+                                                    {% for i in instibranch %}
+                                                    <option value="{{i.id}}">{{i.BranchName}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                {% endif %}
+                                                {% if request.user.is_institute %}
+                                                <label>Branch</label>
+                                                <select class="form-control branch_list" name="branch">
+                                                    {% for i in branch %} 
+                                                    {% for ib in instibranch %}
+                                                    {% if ib.branchId == i.id %}
+                                                    <option value="{{i.id}}">{{i.BranchName}}</option>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                    {% endfor %}
+                                                </select>
+                                                {% endif %}
+                                            </div>
+
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Course</label>
+                                                <select class="form-control course_list" name="course">
+                                                    {% for c in course %}
+                                                    <option value="{{c.id}}">{{c.CourseName}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label>Fee</label>
+                                                <input type="text" class="form-control" name="fee" placeholder="Fee"
+                                                    required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label>Status</label>
+                                                <select name="status" class="form-control">
+                                                    <option value="Active">Active</option>
+                                                    <option value="Inactive">Inactive</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12" style="padding-top:50px;">
+                                        <div class="col-lg-6 text-right"><button class="btn btn-success">Submit</button>
+                                        </div>
+                                        <div class="col-lg-6 text-left"><button type="button"
+                                                class="btn btn-danger btn-close">Close</button></div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="row data-update" style="padding-top:50px;display:none">
+                                <form method="post" enctype="multipart/form-data" action="update_institute_course">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label>Course Code</label>
+                                                <input type="text" class="form-control course_code" name="course_code"
+                                                    required="">
+                                                <input type="text" style="display:none;" class="form-control course_id"
+                                                    name="id" hidden="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Branch</label>
+                                                <select class="form-control branch_list course_branch" name="branch">
+                                                    {% for b in branch %}
+                                                    <option value="{{b.id}}">{{b.BranchName}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Course</label>
+                                                <select class="form-control course_list course_course" name="course">
+                                                    {% for c in course %}
+                                                    <option value="{{c.id}}">{{c.CourseName}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label>Fee</label>
+                                                <input type="text" class="form-control course_fee" name="fee"
+                                                    placeholder="Fee" required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <div class="form-group">
+                                                <label>Status</label>
+                                                <select name="status" class="form-control status">
+                                                    <option value="Active">Active</option>
+                                                    <option value="Inactive">Inactive</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12" style="padding-top:50px;">
+                                        <div class="col-lg-6 text-right"><button class="btn btn-success">Submit</button>
+                                        </div>
+                                        <div class="col-lg-6 text-left"><button type="button"
+                                                class="btn btn-danger btn-close">Close</button></div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-footer">
+        <!--<p>&copy; 2019 Fadmin - Crafted with <i class="mdi mdi-heart text-danger"></i> by ThemesBoss.</p>-->
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+
+        $(".btn-add").click(function () {
+
+            $(".data-list").hide();
+            $(".data-filter").hide();
+            $(".data-add").show();
+            $(".header-title").html("Add Course");
+        });
+
+        $(".btn-close").click(function () {
+
+            $(".data-list").show();
+            $(".data-filter").show();
+            $(".data-add").hide();
+            $(".data-update").hide();
+            $(".header-title").html("");
+        });
+
+        $(".edit-column").click(function () {
+            var id = $(this).attr("id");
+            $(".data-list").hide();
+            $(".data-filter").hide();
+            $(".data-update").show();
+            $(".header-title").html("Edit Branch");
+            if (id) {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: 'list_institute_course',
+                    data: { id: id },
+                    success: function (data) {
+
+
+                        $(".course_code").val(data[0]);
+                        $(".course_branch").val(data[1]);
+                        $(".course_course").val(data[2]);
+                        $(".course_fee").val(data[3]);
+                        $(".course_id").val(data[4]);
+                        $(".status").val(data[5]);
+                    }
+                });
+            }
+            else {
+                alert("Something wrong please try after some time !");
+            }
+        });
+
+        $(".branch_list").change(function () {
+            var id = $(this).val();
+            console.log(id);
+            if (id) {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: 'list_institute_branch_courses',
+                    data: { branchId: id },
+                    success: function (html) {
+                        $(".course_list").html("");
+                        for (i = 0; i < html.length; i++) {
+                            course = html[i]
+                            $(".course_list").append('<option value="' + course['id'] + '">' + course["course"] + '</option>');
+                        }
+                    }
+                });
+            }
+            else {
+                alert("Something wrong please try after some time !");
+            }
+        });
+
+        $(".delete-column").click(function () {
+            var id = $(this).attr("id");
+
+            if (confirm("Are you sure ? You want to delete this ?")) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'delete_insitute_course',
+                    data: { id: id },
+                    success: function (html) {
+                        window.location.reload();
+                    }
+                });
+            }
+            else {
+                alert("Something wrong please try after some time !");
+            }
+        });
+    });
+</script>
+{% endblock %}

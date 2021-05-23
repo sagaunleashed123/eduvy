@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+
+
+
+
+<div class="page-inner">
+    <div class="page-title mb-15">
+        <div class="pull-left">
+            <h3 class="breadcrumb-header">Courses</h3>
+            <p class="text-muted mb-0">Courses under Institutions</p>
+        </div>
+        <div class="pull-right">
+            <div class="btn-group mx-auto">
+                <ol class="breadcrumb hide-phone pt-4 pb-4 m-0">
+                    <li class="breadcrumb-item"><a href="#">Eduvy</a></li>
+                    <li class="breadcrumb-item"><a href="#">Institutions</a></li>
+                    <li class="breadcrumb-item active">Courses</li>
+                </ol>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div id="main-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel mb-0">
+                    <div class="panel-body">
+                        <h4 class="mt-0 header-title"></h4>
+                        <!--<p class="text-muted mb-30 font-15">Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient monte.</p>-->
+                        <div class="row data-filter" style="padding-top:50px;">
+                            <div class="col-md-1">
+                            </div>
+                            <form method="post" action="">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input type="search" id="searchput" name="search" placeholder="Search..."
+                                            class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <button name="searchbutt" id="searchbut"
+                                            class="btn btn-warning form-control">Search</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <button name="addnew" class="btn btn-success form-control btn-add">Add <b
+                                            class="fa fa-plus"></b></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <table class="table table-striped table-responsive data-list">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Branch</th>
+                                        <th>Course Name</th>
+                                        <th>Course Code</th>
+                                        <th>Status</th>
+                                        <th>Added on</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for c in course %}
+                                    <tr>
+                                        <td><img class="eduvy-img-listview" src="media/{{c.CourseImage}}"></td>
+                                        {% for b in branch %}
+                                        {% if b.id == c.Branch %}
+                                        <td>{{b.BranchName}}</td>
+                                        {% endif %}
+                                        {% endfor %}
+                                        {% comment %} {% for b in branch %}
+                                        {% if b.id == c.Branch %}
+                                        <td>{{b.BranchName}}</td>
+                                        {% endif %}
+                                        {% endfor %} {% endcomment %}
+                                        <td>{{c.CourseName}}</td>
+                                        <td>{{c.CourseCode}}</td>
+                                        <td>{{c.Status}}</td>
+                                        <td>{{c.DateofJoin}}</td>
+                                        <td>
+                                            <span style="cursor:pointer;font-size:1em;" class="fa fa-pencil edit-column"
+                                                id="{{c.id}}"></span>
+
+                                            <span style="cursor:pointer;margin-left:15px;color:red;font-size:1em;"
+                                                class="fa fa-trash delete-column" id="{{c.id}}">
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+
+                                </tbody>
+                            </table>
+                            <div class="row data-add" style="padding-top:50px;display:none">
+                                <form method="post" enctype="multipart/form-data" action="course">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Branch</label>
+                                                <select class="form-control" name="branch_id">
+                                                    {% for bran in branch%}
+                                                    <option value="{{bran.id}}">{{bran.BranchName}}</option>
+                                                    {% endfor %}
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Course Code</label>
+                                                <input type="text" class="form-control" name="course_code"
+                                                    placeholder="Course Code" required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Course Name</label>
+                                                <input type="text" class="form-control" name="course_name"
+                                                    placeholder="Course Name" required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Course Duration (Year)</label>
+                                                <input type="number" class="form-control" min="1" name="duration"
+                                                    placeholder="Course Duration" required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Description</label>
+                                                <input type="text" class="form-control" name="description"
+                                                    placeholder="Description" required="">
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="">
+                                            <strong>Select Language:</strong>
+                                            <select id="multiple-checkboxes" multiple="multiple">
+                                                <option value="php">PHP</option>
+                                                <option value="javascript">JavaScript</option>
+                                                <option value="java">Java</option>
+                                                <option value="sql">SQL</option>
+                                                <option value="jquery">Jquery</option>
+                                                <option value=".net">.Net</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Image</label>
+                                                <input type="file" class="form-control" name="course_image" required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Status</label>
+                                                <select class="form-control" name="status">
+                                                    <option value="Active">Active</option>
+                                                    <option value="Inactive">Inactive</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12" style="padding-top:50px;">
+                                        <div class="col-lg-6 text-right"><button class="btn btn-success">Submit</button>
+                                        </div>
+                                        <div class="col-lg-6 text-left"><button type="button"
+                                                class="btn btn-danger btn-close">Close</button></div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="row data-update" style="padding-top:50px;display:none">
+                                <form method="post" enctype="multipart/form-data" action="update_course">
+                                    <div class="col-lg-12">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Branch</label>
+                                                <select class="form-control branch_id" name="branch_id">
+                                                    {% for b in branch %}
+                                                    <option value="{{b.id}}">{{b.BranchName}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Course Code</label>
+                                                <input type="text" class="form-control course_code" name="course_code"
+                                                    placeholder="Course Code" required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Course Name</label>
+                                                <input type="text" class="form-control course_name" name="course_name"
+                                                    placeholder="Course Name" required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Course Duration (Year)</label>
+                                                <input type="number" class="form-control duration" min="1"
+                                                    name="duration" placeholder="Course Duration" required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Description</label>
+                                                <input type="text" class="form-control description" name="description"
+                                                    placeholder="Description" required="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group documents_list">
+
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Image</label>
+                                                <input type="file" class="form-control" name="course_image">
+                                                <input type="text" name="id" class="course_id" hidden=""
+                                                    style="display:none">
+                                                <input type="text" name="image_path" class="image_path" hidden=""
+                                                    style="display:none">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Status</label>
+                                                <select class="form-control status" name="status">
+                                                    <option value="Active">Active</option>
+                                                    <option value="Inactive">Inactive</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12" style="padding-top:50px;">
+                                        <div class="col-lg-6 text-right"><button class="btn btn-success">Submit</button>
+                                        </div>
+                                        <div class="col-lg-6 text-left"><button type="button"
+                                                class="btn btn-danger btn-close">Close</button></div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-footer">
+        <!--<p>&copy; 2019 Fadmin - Crafted with <i class="mdi mdi-heart text-danger"></i> by ThemesBoss.</p>-->
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+
+        $(".btn-add").click(function () {
+
+            $(".data-list").hide();
+            $(".data-filter").hide();
+            $(".data-add").show();
+            $(".header-title").html("Add Course");
+
+        });
+
+        $(".btn-close").click(function () {
+
+            $(".data-list").show();
+            $(".data-filter").show();
+            $(".data-add").hide();
+            $(".data-update").hide();
+            $(".header-title").html("");
+
+        });
+        $(".delete-column").click(function () {
+            var id = $(this).attr("id");
+            console.log(id);
+
+            if (confirm("Are you sure ? You want to delete this ?")) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'delete_course',
+                    data: { id: id },
+                    success: function (html) {
+                        if (html == true) {
+                            window.location.reload();
+                        }
+                        else {
+                            //alert("You cannot delete this Course, This Course assigned with Institution Courses.");
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+            else {
+                alert("Something wrong please try after some time !");
+            }
+        });
+
+        $(".edit-column").click(function () {
+            var id = $(this).attr("id");
+
+            $(".data-list").hide();
+            $(".data-filter").hide();
+            $(".data-update").show();
+            $(".header-title").html("Edit Course");
+
+            if (id) {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: 'list_course',
+                    data: { id: id },
+                    success: function (data) {
+
+                        $(".course_code").val(data[1]);
+                        $(".course_name").val(data[2]);
+                        $(".branch_id").val(data[3]);
+                        console.log(data[3]);
+                        $(".description").val(data[5]);
+                        $(".duration").val(data[4]);
+                        $(".course_id").val(data[0]);
+                        //$(".documents_list").html(html.documents);
+                        $(".image_path").val(data[6]);
+                        $(".status").val(data[7]);
+
+                        $('#example-enableCaseInsensitiveFiltering2').multiselect({
+                            enableCaseInsensitiveFiltering: true,
+                            includeSelectAllOption: true
+                        });
+                    }
+                });
+            }
+            else {
+                alert("Something wrong please try after some time !");
+            }
+        });
+
+
+    });
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        $('#multiple-checkboxes').multiselect({
+            includeSelectAllOption: true
+        });
+
+    });
+</script>
+{% endblock %}
