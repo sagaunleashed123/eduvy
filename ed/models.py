@@ -80,7 +80,7 @@ class SupportingDoc(models.Model):
         return self.DocumentName
     
     class Meta:
-        db_table = 'Supporting Documents'
+        db_table = 'SupportingDocuments'
         managed = True
         verbose_name = 'Supporting Document'
         verbose_name_plural = 'Supporting Documents'
@@ -124,7 +124,7 @@ class planBanner(models.Model):
         return self.Title
 
     class Meta:
-        db_table = 'Plan Banner'
+        db_table = 'PlanBanner'
         managed = True
         verbose_name = 'Planbanner'
         verbose_name_plural = 'Planbanners'
@@ -142,7 +142,7 @@ class introBanner(models.Model):
         return self.Title
 
     class Meta:
-        db_table = 'Intro Banner'
+        db_table = 'IntroBanner'
         managed = True
         verbose_name = 'Introbanner'
         verbose_name_plural = 'Introbanners'
@@ -158,7 +158,7 @@ class instituteBanner(models.Model):
         return self.Title
 
     class Meta:
-        db_table = 'institute Banner'
+        db_table = 'instituteBanner'
         managed = True
         verbose_name = 'institutebanner'
         verbose_name_plural = 'institutebanners'
@@ -243,12 +243,13 @@ class instituteBranch(models.Model):
         return self.branchCode
     
     class Meta:
-        db_table = 'Institution Branch'
+        db_table = 'InstitutionBranch'
         managed = True
         verbose_name = 'InstitutionBranch'
         verbose_name_plural = 'InstitutionBranches'
 
 class institutionCourse(models.Model):
+    id = models.AutoField(primary_key=True)
     institutionId= models.IntegerField(verbose_name="Institution ID",default=1)
     courseCode = models.CharField(verbose_name="Course Code",default="BSC",max_length=150,unique=True)
     courseFee = models.CharField(verbose_name="Course Fee",default="100000",max_length=150)
@@ -263,7 +264,7 @@ class institutionCourse(models.Model):
         return self.courseCode
     
     class Meta:
-        db_table = 'Institution Course'
+        db_table = 'InstitutionCourse'
         managed = True
         verbose_name = 'InstitutionCourse'
         verbose_name_plural = 'InstitutionCourses'

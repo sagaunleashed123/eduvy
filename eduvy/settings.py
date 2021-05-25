@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'eduvy.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'eduvytest',
+        'NAME': 'eduvy',
     }
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',

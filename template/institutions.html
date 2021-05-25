@@ -111,6 +111,31 @@
 									{% endfor %}
 								</tbody>
 							</table>
+							<nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                    {% if institute.paginator.num_pages > 1 %}
+                                    {% if institute.has_previous %}
+                                    <li>
+                                        <a href="?page={{institute.previous_page_number }}">
+                                            << Prev</a>
+                                    </li>
+                                    {% endif %}
+                                    {% for pg in institute.paginator.page_range%}
+                                    {% if posts.number == pg %}
+                                    <li class="active" style="font-weight: 700;"><a href="?page={{ pg }}">{{pg}}</a>
+                                    </li>
+                                    {% else %}
+                                    <li><a href="?page={{ pg }}">{{pg}}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if institute.has_next %}
+                                    <li>
+                                        <a href="?page={{institute.next_page_number }}">Next >></a>
+                                    </li>
+                                    {% endif %}
+                                    {% endif %}
+                                </ul>
+                            </nav>
 							<div class="row data-add" style="padding-top:50px;display:none">
 								<form method="post" enctype="multipart/form-data" action="institution">
 									{% csrf_token %}

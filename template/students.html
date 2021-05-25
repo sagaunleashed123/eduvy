@@ -99,6 +99,21 @@
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label>Course</label>
+                                                {% if request.user.is_institute %}
+                                                <select class="form-control course_id" name="course_id">
+                                                    {% if insticourse %}
+                                                    {% for c in insticourse %}
+                                                    {% for i in course %}
+                                                    {% if c.courseId == i.id %}
+                                                        <option value="{{i.id}}">{{i.CourseName}}</option>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                    {% endfor %}
+                                                    {% endif %}
+
+                                                </select>
+                                                {% endif %}
+                                                {% if request.user.is_superuser %}
                                                 <select class="form-control course_id" name="course_id">
                                                     {% if course %}
                                                     {% for i in course %}
@@ -107,6 +122,7 @@
                                                     {% endif %}
 
                                                 </select>
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <div class="col-lg-4">

@@ -37,7 +37,7 @@
                         <div class="row data-filter" style="padding-top:50px;">
                             <div class="col-md-1">
                             </div>
-                            <form method="post" action="">
+                            <form method="post" action="search_branch" class="search_branch">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <input type="search" id="searchput" name="search" placeholder="Search..."
@@ -72,7 +72,7 @@
                                 </thead>
                                 <tbody>
                                     {% for branch in branches %}
-                                    <tr>
+                                    <tr class="search-results">
                                         <td><img class="eduvy-img-listview" src="media/{{branch.Image}}"></td>
                                         <td>{{branch.BranchCode}}</td>
                                         <td>{{branch.BranchName}}</td>
@@ -81,15 +81,41 @@
                                         <td>
                                             <span style="cursor:pointer;font-size:1em;" class="fa fa-pencil edit-column"
                                                 id="{{branch.id}}">
-                                                </span>
-                                                <span style="cursor:pointer;margin-left:15px;color:red;font-size:1em;"
-                                                    class="fa fa-trash delete-column" id="{{branch.id}}">
-                                                </span>
+                                            </span>
+                                            <span style="cursor:pointer;margin-left:15px;color:red;font-size:1em;"
+                                                class="fa fa-trash delete-column" id="{{branch.id}}">
+                                            </span>
                                         </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
+
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                    {% if branches.paginator.num_pages > 1 %}
+                                    {% if branches.has_previous %}
+                                    <li>
+                                        <a href="?page={{branches.previous_page_number }}">
+                                            << Prev</a>
+                                    </li>
+                                    {% endif %}
+                                    {% for pg in branches.paginator.page_range%}
+                                    {% if posts.number == pg %}
+                                    <li class="active" style="font-weight: 700;"><a href="?page={{ pg }}">{{pg}}</a>
+                                    </li>
+                                    {% else %}
+                                    <li><a href="?page={{ pg }}">{{pg}}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if branches.has_next %}
+                                    <li>
+                                        <a href="?page={{branches.next_page_number }}">Next >></a>
+                                    </li>
+                                    {% endif %}
+                                    {% endif %}
+                                </ul>
+                            </nav>
                             <div class="row data-add" style="padding-top:50px;display:none">
                                 <form method="POST" enctype="multipart/form-data" id="branch-submit">
                                     {% csrf_token %}
@@ -136,7 +162,8 @@
                             </div>
 
                             <div class="row data-update" style="padding-top:50px;display:none">
-                                <form method="post" enctype="multipart/form-data" id="update_branch" action="update_branch">
+                                <form method="post" enctype="multipart/form-data" id="update_branch"
+                                    action="update_branch">
                                     <div class="col-lg-12">
                                         <div class="col-lg-3">
                                             <div class="form-group">
@@ -155,7 +182,8 @@
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>Image</label>
-                                                <input type="file" class="form-control" class="branch_image" id="branch_image" name="branch_image_up">
+                                                <input type="file" class="form-control" class="branch_image"
+                                                    id="branch_image" name="branch_image_up">
                                                 <input type="text" name="_id" class="branch_id" hidden=""
                                                     style="display:none">
                                                 <input type="text" name="image_path" class="image_path" hidden=""
@@ -173,7 +201,8 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-12" style="padding-top:50px;">
-                                        <div class="col-lg-6 text-right"><input  value="Submit" type="submit" class="btn btn-success">
+                                        <div class="col-lg-6 text-right"><input value="Submit" type="submit"
+                                                class="btn btn-success">
                                         </div>
                                         <div class="col-lg-6 text-left"><button type="button"
                                                 class="btn btn-danger btn-close">Close</button></div>
@@ -192,7 +221,33 @@
 </div>
 <script>
     $(document).ready(function () {
-        console.log("wrking");
+        $(".search_branch").submit(function (event) {
+            var formData = {
+                search: $("#searchput").val(),
+
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "search_branch",
+                data: formData,
+                dataType: "json",
+                encode: true,
+            }).done(function (data) {
+                console.log(data.length);
+                $("tbody tr").remove();
+                for (i = 0; i < data.length; i++) {
+                    $('tbody').append("<tr><td><img class='eduvy-img-listview' src='media/" + data[i]['Image'] + "'></td><td>" + data[i]['BranchCode'] + "</td><td>"+data[i]['BranchName']+"</td><td>"+data[i]['Status']+"</td><td>"+data[i]['DateofJoin']+"</td><td><span style='cursor:pointer;font-size:1em;' class='fa fa-pencil edit-column' id='"+ data[i]['id'] + "'></span><span style='cursor:pointer;margin-left:15px;color:red;font-size:1em;' class='fa fa-trash delete-column' id='"+ data[i]['id'] + "'></span></td></tr>");
+                }
+
+
+            });
+
+            event.preventDefault();
+        });
+    });
+    $(document).ready(function () {
+
         $(".btn-add").click(function () {
 
             $(".data-list").hide();
@@ -238,7 +293,7 @@
                     $(".data-filter").hide();
                     $(".data-update").show();
                     $(".header-title").html("Edit Branch");
-                    console.log(data[1]);
+                    console.log(data);
 
                     $(".branch_id").val(data[0]);
                     $(".branch_code").val(data[1]);

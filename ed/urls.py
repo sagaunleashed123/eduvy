@@ -52,5 +52,5 @@ urlpatterns = [
     path("list_course_duration", views.list_course_duration, name="list_course_duration"),
     path("list_student", views.list_student, name="list_student"),
     path("delete_student", views.delete_student, name="delete_student"),
-    path("demo", views.demo, name="demo"),
+    path("search_branch", views.search_branch, name="search_branch"),
     ]

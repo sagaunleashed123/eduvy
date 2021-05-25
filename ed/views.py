@@ -1,3 +1,4 @@
+from django.core import paginator
 from django.shortcuts import render,redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import  auth
@@ -10,6 +11,8 @@ import pymongo,json
 from django.http import JsonResponse,HttpResponse
 from django.conf import settings
 import datetime,os
+from django.core.paginator import EmptyPage, InvalidPage, Paginator
+from django.core import serializers
 # import pandas as pd
 
 # Create your views here.
@@ -97,9 +100,28 @@ def institution(request):
             send_mail( subject, message, email_from, recipient_list )
             return redirect('institution')
     except Exception :
-        return render(request,'institutions.html')
+        institutes = Institution.objects.all()
+        paginator = Paginator(institutes,10)
+        try:
+            page = int(request.GET.get('page','1'))
+        except:
+            page = 1
+        try:
+            institute = paginator.page(page)
+        except(EmptyPage,InvalidPage):
+            institute = paginator.page(paginator.num_pages) 
+        return render(request,'institutions.html',{'institute':institute})
     if request.user.is_superuser:
-        institute = Institution.objects.all()
+        institutes = Institution.objects.all()
+        paginator = Paginator(institutes,10)
+        try:
+            page = int(request.GET.get('page','1'))
+        except:
+            page = 1
+        try:
+            institute = paginator.page(page)
+        except(EmptyPage,InvalidPage):
+            institute = paginator.page(paginator.num_pages) 
         return render(request,'institutions.html',{'institute':institute})
 
 @csrf_exempt
@@ -137,7 +159,16 @@ def branch(request):
         BranchSave = Branch(user = request.user.id, BranchCode=BranchCode, BranchName=Branchname, Image=Image, Status=Status)
         BranchSave.save()
         return redirect('branch')
-    branch = Branch.objects.all()
+    bran = Branch.objects.all()
+    paginator = Paginator(bran,10)
+    try:
+        page = int(request.GET.get('page','1'))
+    except:
+        page = 1
+    try:
+        branch = paginator.page(page)
+    except(EmptyPage,InvalidPage):
+        branch = paginator.page(paginator.num_pages)
     return render(request, "branch.html", {"branches": branch})
 
 
@@ -167,7 +198,17 @@ def course(request):
         messages.warning(request, 'Your account expires in three days.')
         print("Oops!", e.__class__, "occurred.")
     if request.user.is_superuser:
-        course = Course.objects.all()
+        courses = Course.objects.all()
+        paginator = Paginator(courses,10)
+        try:
+            page = int(request.GET.get('page',1))
+        except:
+            page = 1
+        try:
+            course = paginator.page(page)
+        except(EmptyPage,InvalidPage):
+            course = paginator.page(paginator.num_pages)
+        print(course)
         branch = Branch.objects.all()
         sup = SupportingDoc.objects.all()
         context = {"course" : course,"branch" : branch,"sup" : sup}
@@ -540,7 +581,16 @@ def supporting_documents(request):
         sup_doc = SupportingDoc(DocumentName = DocName, Status = Status)
         sup_doc.save()
         return redirect(supporting_documents)
-    sup_doc = SupportingDoc.objects.all()
+    sup_document = SupportingDoc.objects.all()
+    paginator = Paginator(sup_document,10)
+    try:
+        page = int(request.GET.get('page','1'))
+    except:
+        page = 1
+    try:
+        sup_doc = paginator.page(page)
+    except(EmptyPage,InvalidPage):
+        sup_doc = paginator.page(paginator.num_pages)
     return render(request,"supporting-document.html",{'sup_doc': sup_doc})
 
 @csrf_exempt
@@ -919,7 +969,7 @@ def institutecourse(request):
             status = request.POST['status']
             userid =  request.user.id
             instiid = Institution.objects.get( user = userid)      
-            course = institutionCourse(institutionId = instiid.id,courseCode = code,courseFee = fee, branchId = branch, courseId = course, Status = status)
+            course = institutionCourse.objects.create(institutionId = instiid.id,courseCode = code,courseFee = fee, branchId = branch, courseId = course, Status = status)
             course.save()
             return redirect(institutecourse)
     except Exception as e:
@@ -964,7 +1014,7 @@ def list_institute_branch_courses(request):
         print(branch)
         client = pymongo.MongoClient("mongodb://localhost:27017/")
         # Database Name
-        db = client["eduvy"]
+        db = client["eduvytest"]
         
         # Collection Name
         con = db["Courses"]
@@ -987,57 +1037,68 @@ def list_institute_branch_courses(request):
 @login_required(login_url="login")
 @csrf_exempt
 def students(request):
-    if request.method == "POST":
-        batch = request.POST['batch']
-        batch_section = request.POST['batch_section']
-        course_id = request.POST['course_id'] 
-        name = request.POST['name']
-        email = request.POST['email']
-        phone = request.POST['phone']
-        address = request.POST['address']
-        guardian_name = request.POST['guardian_name']
-        guardian_phone = request.POST['guardian_phone']
-        guardian_phone = request.POST['guardian_phone']
-        course = institutionCourse.objects.get(courseId = course_id)
-        course_code = course.courseCode
-        branch_id = course.branchId
-        admission = course.admissionid
-        admission = admission + 1
-        course.admissionid = admission
-        course.save()
-        branch = Branch.objects.get(id = branch_id)
-        branch_code = branch.BranchCode
-        institutionId = branch.user
-        userid =  request.user.id
-        instiid = Institution.objects.get( user = userid)
-        institutioncode = instiid.institutionCode
-        studentid = str(institutioncode) + str(batch) + str(branch_code) + str(course_code) + str(admission)
-        print(studentid)
-        randompass = NewUser.objects.make_random_password()
-        print(randompass)
-        userreg = NewUser(email = email,is_student = True,is_active =True) 
-        userreg.set_password(123)  #change this at the time of deployment   
-        userreg.save()
-        subject = 'welcome to Eduvy'
-        message = f'Hi, thank you for registering in Eduvy.Your Password is {randompass}'
-        email_from = settings.EMAIL_HOST_USER
-        recipient_list = [email, ]
-        send_mail( subject, message, email_from, recipient_list )
-        student = Students(batch = batch,batchSection=batch_section,studentID=studentid,institutionId=instiid.id,name=name,email=email,branchId= branch_id,courseId = course_id,phone = phone,address =address,guardianName = guardian_name,guardianPhone = guardian_phone)
-        print(student)
-        student.save()
-        return redirect(students)
+    try:
+        if request.method == "POST":
+            batch = request.POST['batch']
+            batch_section = request.POST['batch_section']
+            course_id = request.POST['course_id'] 
+            name = request.POST['name']
+            email = request.POST['email']
+            phone = request.POST['phone']
+            address = request.POST['address']
+            guardian_name = request.POST['guardian_name']
+            guardian_phone = request.POST['guardian_phone']
+            guardian_phone = request.POST['guardian_phone']
+            print(course_id)
+            course = institutionCourse.objects.get(courseId = course_id)
+            print(course)
+            course_code = course.courseCode
+            branch_id = course.branchId
+            admission = course.admissionid
+            admission = admission + 1
+            print(admission)
+            course.admissionid = admission
+            course.save()
+            branch = Branch.objects.get(id = branch_id)
+            print(branch)
+            branch_code = branch.BranchCode
+            institutionId = branch.user
+            userid =  request.user.id
+            instiid = Institution.objects.get( user = userid)
+            print(instiid)
+            institutioncode = instiid.institutionCode
+            studentid = str(institutioncode) + str(batch) + str(branch_code) + str(course_code) + str(admission)
+            print(studentid)
+            randompass = NewUser.objects.make_random_password()
+            print(123)
+            userreg = NewUser(email = email,is_student = True,is_active =True) 
+            userreg.set_password(123)  #change this at the time of deployment   
+            userreg.save()
+            subject = 'welcome to Eduvy'
+            message = f'Hi, thank you for registering in Eduvy.Your Password is {randompass}'
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [email, ]
+            # send_mail( subject, message, email_from, recipient_list )
+            student = Students(batch = batch,batchSection=batch_section,studentID=studentid,institutionId=instiid.id,name=name,email=email,branchId= branch_id,courseId = course_id,phone = phone,address =address,guardianName = guardian_name,guardianPhone = guardian_phone)
+            print(student)
+            student.save()
+            return redirect(students)
+    except Exception as e:
+        print(str(e))
     if request.user.is_superuser:
         course = Course.objects.all()
         student = Students.objects.all()
         context = {'course':course,'student':student}
         return render(request,'students.html',context)
     if request.user.is_institute:
+        institution = Institution.objects.get(user = request.user.id)
+        insticourse = institutionCourse.objects.filter(institutionId = institution.id)
         course = Course.objects.all()
+        print(course)
         userid =  request.user.id
         instiid = Institution.objects.get( user = userid)
         student = Students.objects.filter(institutionId = instiid.id)
-        context = {'course':course,'student':student}
+        context = {'course':course,'student':student,'insticourse':insticourse}
         return render(request,'students.html',context)
 
 @csrf_exempt
@@ -1085,5 +1146,31 @@ def delete_student(request):
         return JsonResponse(data)
     return redirect(students)
 
-def demo(request):
-    return render(request,'demo.html')
+import datetime
+from json import JSONEncoder
+
+class DateTimeEncoder(JSONEncoder):
+        #Override the default method
+        def default(self, obj):
+            if isinstance(obj, (datetime.date, datetime.datetime)):
+                return obj.isoformat()
+
+@csrf_exempt
+def search_branch(request):
+    if request.method == "POST":
+        searched = request.POST['search']
+        bran = Branch.objects.filter(BranchName__icontains=searched).values()
+        length = len(list(bran))
+        # print(length)
+        branch = []
+        for i in range(0,length):
+            b = list(bran)[i]
+            branch.append(b)
+        # data = json.dumps(bran)
+        # print(branch)
+        # print(list(bran))
+        # return JsonResponse(branch)
+        data = json.dumps(branch,indent=4, cls=DateTimeEncoder)
+        return HttpResponse(data)
+
+    # return render(request,'demo.html')  
