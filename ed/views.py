@@ -183,14 +183,19 @@ def course(request):
             Coursename = request.POST["course_name"]
             Duration = request.POST['duration']
             Descrip = request.POST['description']
-            Doc = request.POST['documents']
             Image = request.FILES["course_image"]
             Status = request.POST["status"]
-            print(BranchID)
-            
+            print("hello")
+            Doc = request.POST.getlist("documents[]")
+            print(Doc)
+            document = ""
+            for i in Doc:
+                document = document + i
+                print(document)            
+                document = document + ","
 
             CourseSave = Course(user = request.user.id,
-                Branch=BranchID, CourseCode=CourseCode, CourseName=Coursename, CourseDuration=Duration, CourseDescription = Descrip, SupDoc = Doc, CourseImage = Image, Status = Status
+                Branch=BranchID, CourseCode=CourseCode, CourseName=Coursename, CourseDuration=Duration, CourseDescription = Descrip, SupDoc = document, CourseImage = Image, Status = Status
             )
             CourseSave.save()
             return redirect("course")
@@ -208,7 +213,7 @@ def course(request):
             course = paginator.page(page)
         except(EmptyPage,InvalidPage):
             course = paginator.page(paginator.num_pages)
-        print(course)
+        # print(course)
         branch = Branch.objects.all()
         sup = SupportingDoc.objects.all()
         context = {"course" : course,"branch" : branch,"sup" : sup}
@@ -403,11 +408,12 @@ def list_course(request):
         Name = instance[0]['CourseName']
         branch_id = instance[0]['Branch']
         duration = instance[0]['CourseDuration']
+        document = instance[0]['SupDoc']
         desc = instance[0]['CourseDescription']
         Image = instance[0]['CourseImage']
         Status = instance[0]['Status']
         ID = instance[0]['id']
-        context = [ID,Code,Name,branch_id,duration,desc,Image,Status]
+        context = [ID,Code,Name,branch_id,duration,desc,Image,Status,document]
         print(context)
         data = json.dumps(context)
         return HttpResponse(data)
@@ -539,6 +545,13 @@ def update_course(request):
         Name = request.POST['course_name']
         Duruation = request.POST['duration']
         description = request.POST['description']
+        Doc = request.POST.getlist("documents[]")
+        print(Doc)
+        document = ""
+        for i in Doc:
+            document = document + i
+            print(document)            
+            document = document + ","
         if len(request.FILES) != 0:
             if len(branch.CourseImage) > 0:
                 os.remove(branch.CourseImage.path)
@@ -548,6 +561,7 @@ def update_course(request):
         branch.Branch = branchid
         branch.CourseDuration = Duruation
         branch.CourseDescription = description
+        branch.SupDoc = document
         branch.CourseCode = code
         branch.Status = status
         branch.save()
@@ -1173,4 +1187,7 @@ def search_branch(request):
         data = json.dumps(branch,indent=4, cls=DateTimeEncoder)
         return HttpResponse(data)
 
-    # return render(request,'demo.html')  
+    # return render(request,'demo.html')
+
+def demo(request):
+    return render(request,'demo.html')  

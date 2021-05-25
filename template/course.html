@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+    src="http://65.1.111.25/eduvy/assets/multiselect/dist/js/bootstrap-multiselect.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
-<link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
-
+<link rel="stylesheet" href="http://65.1.111.25/eduvy/assets/multiselect/dist/css/bootstrap-multiselect.css"
+    type="text/css">
 
 
 
@@ -102,7 +100,7 @@
 
                                 </tbody>
                             </table>
-                            
+
                             <nav aria-label="Page navigation example">
                                 <ul class="pagination">
                                     {% if course.paginator.num_pages > 1 %}
@@ -171,22 +169,27 @@
                                             </div>
                                         </div>
 
-                                        
+                                        <style>
+                                            .multiselect-native-select .btn-group {
+                                                width: 100% !important;
+                                            }
+
+                                            .multiselect-native-select .btn-group button {
+                                                width: 100% !important;
+                                            }
+                                        </style>
                                         <div class="col-lg-3">
                                             <div class="form-group">
-                                                <label>Supporting Documents</label>
-                                                <span class="multiselect-native-select"><select name="documents"
-                                                        id="example-enableCaseInsensitiveFiltering" class="form-control"
-                                                        multiple="">
-                                                        {% for s in  sup%}
-                                                            <option value="{{s.DocumentName}}">{{s.DocumentName}}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </span>
+                                                <strong>Supporting Documents:</strong>
+                                                <select name="documents[]" id="multiple-checkboxes" multiple="multiple">
+                                                    {% for i in sup %}
+                                                    <option value="{{i.id}}">{{i.DocumentName}}</option>
+                                                    {% endfor %}
+                                                </select>
                                             </div>
                                         </div>
 
-                                        
+
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label>Image</label>
@@ -255,7 +258,12 @@
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group documents_list">
-
+                                                <strong>Supporting Documents:</strong>
+                                                <select name="documents[]" id="multiple-checkboxes-update" multiple="multiple">
+                                                    {% for i in sup %}
+                                                    <option value="{{i.id}}">{{i.DocumentName}}</option>
+                                                    {% endfor %}
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
@@ -349,6 +357,10 @@
             $(".data-filter").hide();
             $(".data-update").show();
             $(".header-title").html("Edit Course");
+            $('#multiple-checkboxes-update').multiselect({
+                enableCaseInsensitiveFiltering: true,
+                includeSelectAllOption: true
+            });
 
             if (id) {
                 $.ajax({
@@ -361,18 +373,16 @@
                         $(".course_code").val(data[1]);
                         $(".course_name").val(data[2]);
                         $(".branch_id").val(data[3]);
-                        console.log(data[3]);
                         $(".description").val(data[5]);
                         $(".duration").val(data[4]);
                         $(".course_id").val(data[0]);
                         //$(".documents_list").html(html.documents);
+                        var doc = data[8]
+                        var dataarray=data.toString().split(",");
+                        $("#multiple-checkboxes-update").val(dataarray);
+                        $("#multiple-checkboxes-update").multiselect("refresh");
                         $(".image_path").val(data[6]);
                         $(".status").val(data[7]);
-
-                        $('#example-enableCaseInsensitiveFiltering2').multiselect({
-                            enableCaseInsensitiveFiltering: true,
-                            includeSelectAllOption: true
-                        });
                     }
                 });
             }
@@ -390,9 +400,9 @@
 <script>
     $(document).ready(function () {
         $('#multiple-checkboxes').multiselect({
-            includeSelectAllOption: true
+            includeSelectAllOption: true,
+            enableCaseInsensitiveFiltering: true,
         });
-
-    });
+    })
 </script>
 {% endblock %}

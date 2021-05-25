@@ -53,4 +53,5 @@ urlpatterns = [
     path("list_student", views.list_student, name="list_student"),
     path("delete_student", views.delete_student, name="delete_student"),
     path("search_branch", views.search_branch, name="search_branch"),
+    path("demo", views.demo, name="demo"),
     ]

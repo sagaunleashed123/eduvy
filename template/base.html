@@ -18,10 +18,9 @@
     <link rel="stylesheet" href="{% static 'plugins/morris/morris.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
     <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js">
-    </script>
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script>
         function isNumberKey(evt) {
             var charCode = (evt.which) ? evt.which : event.keyCode
@@ -31,13 +30,13 @@
             return true;
         }
     </script>
-    <script type="text/javascript">
+    <!-- <script type="text/javascript">
         $(document).ready(function () {
             $('#example-enableCaseInsensitiveFiltering').multiselect({
                 enableCaseInsensitiveFiltering: true,
                 includeSelectAllOption: true
             });
-        });</script>
+        });</script> -->
     <style>
         td {
             vertical-align: inherit !important;
@@ -475,6 +474,9 @@
     </div>
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript"
+        src="http://65.1.111.25/eduvy/assets/multiselect/dist/js/bootstrap-multiselect.js"></script>
     <script src="{% static 'plugins/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
     <script src="{% static 'plugins/uniform/js/jquery.uniform.standalone.js' %}"></script>
     <script src="{% static 'plugins/switchery/switchery.min.js' %}"></script>
